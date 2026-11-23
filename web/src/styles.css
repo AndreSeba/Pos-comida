@@ -223,3 +223,15 @@ body { background: var(--page); -webkit-text-size-adjust: 100%; }
 .orden-grupo { border: 1px solid var(--bs-border-color); border-radius: 12px; overflow: hidden; }
 .orden-cab { padding: .6rem .75rem; background: var(--bs-secondary-bg); }
 .orden-grupo .list-group-item:last-child { border-bottom: 0; }
+
+/* ventana de confirmación */
+.confirmar-fondo { z-index: 1090; backdrop-filter: blur(3px); animation: confirmar-fondo .15s ease-out; }
+.confirmar-dialogo { max-width: 380px; }
+.confirmar-tarjeta { padding: 1.75rem 1.5rem 1.5rem; border: 0; border-radius: 22px; box-shadow: 0 24px 60px rgba(0, 0, 0, .35); animation: confirmar-entra .2s cubic-bezier(.2, .9, .3, 1.2); }
+.confirmar-texto { white-space: pre-line; }
+.confirmar-icono { width: 64px; height: 64px; margin: 0 auto 1rem; border-radius: 50%; display: grid; place-items: center; }
+.confirmar-icono.peligro { background: rgba(var(--bs-danger-rgb), .14); color: var(--bs-danger); }
+.confirmar-icono.aviso { background: rgba(var(--bs-primary-rgb), .14); color: var(--bs-primary); }
+@keyframes confirmar-fondo { from { opacity: 0; } to { opacity: 1; } }
+@keyframes confirmar-entra { from { opacity: 0; transform: translateY(14px) scale(.94); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .confirmar-fondo, .confirmar-tarjeta { animation: none; } }

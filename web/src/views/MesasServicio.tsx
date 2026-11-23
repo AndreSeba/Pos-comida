@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api'
 import type { MesaServicio } from '../types'
-import { Estado, avisar, avisarError } from '../ui'
+import { Estado, avisar, avisarError, confirmar } from '../ui'
 import { horaCorta } from '../util'
 
 interface Carga<T> {
@@ -36,13 +36,13 @@ export function ListaMesas({ mesas, conPermiso }: { mesas: Carga<MesaServicio>; 
     }
   }
 
-  const cerrar = (m: MesaServicio) => {
-    if (!confirm(`¿Cerrar ${m.nombre}?\n\nSus celulares dejan de poder pedir y los pedidos que todavía no aceptaste se cancelan. La cuenta abierta sigue para cobrarla.`)) return
+  const cerrar = async (m: MesaServicio) => {
+    if (!(await confirmar({ titulo: `¿Cerrar ${m.nombre}?`, mensaje: 'Sus celulares dejan de poder pedir y los pedidos que todavía no aceptaste se cancelan. La cuenta abierta sigue para cobrarla.', aceptar: 'Cerrar mesa', tono: 'aviso' }))) return
     void llamar(`${m.id}/cerrar`, `${m.nombre} cerrada`)
   }
 
-  const abrir = (m: MesaServicio) => {
-    if (m.abierta && !confirm(`${m.nombre} ya está abierta. Si la abres de nuevo, los celulares actuales tendrán que volver a entrar. ¿Seguir?`)) return
+  const abrir = async (m: MesaServicio) => {
+    if (m.abierta && !(await confirmar({ titulo: `${m.nombre} ya está abierta`, mensaje: 'Si la abres de nuevo, los celulares actuales tendrán que volver a entrar.', aceptar: 'Abrir de nuevo', tono: 'aviso' }))) return
     void llamar(`${m.id}/abrir`, `${m.nombre} abierta: quien escanee su QR en los próximos minutos entra solo`)
   }
 

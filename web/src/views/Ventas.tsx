@@ -5,7 +5,7 @@ import type { Pago } from '../cobro'
 import { Icono } from '../Icono'
 import { BotonModo, LogoNegocio, SelectorTema } from '../Personalizar'
 import type { Config, MesaServicio, Pedido, ProductoVenta, Sesion, Turno, Venta } from '../types'
-import { Estado, Modal, avisar, avisarError, useCarga, useMarca } from '../ui'
+import { Estado, Modal, avisar, avisarError, useCarga, useMarca, confirmar } from '../ui'
 import { horaCorta, inicioDia, money, pagosTexto, puede } from '../util'
 import { ListaEntregas, ListaPedidos } from './PedidosVista'
 import { ListaMesas } from './MesasServicio'
@@ -152,7 +152,7 @@ export default function Ventas({ sesion, onSalir }: { sesion: Sesion; onSalir: (
   }
 
   const cancelarPedido = async (p: Pedido) => {
-    if (!confirm(`¿Cancelar el pedido #${p.numero}${p.etiqueta ? ` (${p.etiqueta})` : ''}? No se cobra.`)) return
+    if (!(await confirmar({ titulo: `¿Cancelar el pedido #${p.numero}?`, mensaje: `${p.etiqueta ? `${p.etiqueta} · ` : ''}No se cobra.`, aceptar: 'Sí, cancelar pedido' }))) return
     try {
       await api.del(`/api/pedidos/${p.id}`)
       if (editando?.id === p.id) limpiar()
@@ -190,7 +190,7 @@ export default function Ventas({ sesion, onSalir }: { sesion: Sesion; onSalir: (
   }
 
   const sinStock = async (p: Pedido, productoId: number, nombre: string) => {
-    if (!confirm(`¿No hay «${nombre}»?\n\nSe quita de este pedido, se marca como agotado (nadie podrá pedirlo desde la mesa) y el cliente ve el aviso.`)) return
+    if (!(await confirmar({ titulo: `¿No hay «${nombre}»?`, mensaje: 'Se quita de este pedido, se marca como agotado (nadie podrá pedirlo desde la mesa) y el cliente ve el aviso.', aceptar: 'Marcar agotado', tono: 'aviso' }))) return
     try {
       await api.post<Pedido>(`/api/pedidos/${p.id}/sin-stock/${productoId}`, {})
       avisar(`«${nombre}» marcado como agotado`)

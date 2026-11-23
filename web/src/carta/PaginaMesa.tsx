@@ -3,7 +3,7 @@ import { api, mensajeError } from '../api'
 import { Icono } from '../Icono'
 import { LogoNegocio } from '../Personalizar'
 import type { Carta, CartaProducto, ConfigPublica, MesaCarta, PedidoMesa } from '../types'
-import { Modal, avisar, avisarError, useCarga, useMarca } from '../ui'
+import { Modal, avisar, avisarError, useCarga, useMarca, confirmar } from '../ui'
 import { money } from '../util'
 import { Cantidad } from './PaginaCarta'
 
@@ -243,7 +243,7 @@ function Pedir({ datos, carta, ruta, mesaApi, recargar }: { datos: MesaCarta; ca
   }
 
   const cancelar = async (p: PedidoMesa) => {
-    if (!confirm('¿Cancelar este pedido?')) return
+    if (!(await confirmar({ titulo: '¿Cancelar este pedido?', mensaje: 'El personal ya no lo verá.', aceptar: 'Sí, cancelar' }))) return
     try {
       await mesaApi.del(`${ruta}/pedidos/${p.id}`)
       avisar('Pedido cancelado')

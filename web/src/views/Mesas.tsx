@@ -4,7 +4,7 @@ import { api } from '../api'
 import { Icono } from '../Icono'
 import type { Mesa } from '../types'
 import { urlPublica } from '../whatsapp'
-import { Estado, avisar, avisarError, useCarga } from '../ui'
+import { Estado, avisar, avisarError, useCarga, confirmar } from '../ui'
 import type { Catalogo } from './Admin'
 import { Paginador, usePaginas } from '../paginacion'
 
@@ -122,7 +122,7 @@ export default function Mesas({ cat }: { cat: Catalogo }) {
   }
 
   const nuevoQr = async (m: Mesa) => {
-    if (!confirm(`¿Generar un QR nuevo para «${m.nombre}»?\n\nEl QR que ya está impreso o pegado en la mesa dejará de funcionar y tendrás que reemplazarlo.`)) return
+    if (!(await confirmar({ titulo: `¿Generar un QR nuevo para «${m.nombre}»?`, mensaje: 'El QR que ya está impreso o pegado en la mesa dejará de funcionar y tendrás que reemplazarlo.', aceptar: 'Generar QR nuevo', tono: 'aviso' }))) return
     try {
       await api.post(`/api/mesas/${m.id}/nuevo-qr`, {})
       avisar('QR nuevo generado. Imprímelo y reemplaza el anterior.')

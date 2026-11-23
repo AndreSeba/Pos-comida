@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { api } from '../api'
 import type { Ingrediente, UnidadCompra } from '../types'
-import { avisar, avisarError } from '../ui'
+import { avisar, avisarError, confirmar } from '../ui'
 import { aBase, baseDe, costoUnitario, money, num } from '../util'
 import type { Catalogo } from './Admin'
 import { Icono } from '../Icono'
@@ -62,7 +62,7 @@ export default function Ingredientes({ cat }: { cat: Catalogo }) {
   }
 
   const borrar = async (i: Ingrediente) => {
-    if (!confirm(`¿Borrar "${i.nombre}"?`)) return
+    if (!(await confirmar({ titulo: '¿Borrar este ingrediente?', mensaje: `«${i.nombre}» se quita de tu lista.`, aceptar: 'Sí, borrar' }))) return
     try {
       await api.del(`/api/ingredientes/${i.id}`)
       await cat.recargar()

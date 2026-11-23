@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { api } from '../api'
 import type { LineaReceta, Producto, ProductoGuardar, UnidadCompra } from '../types'
-import { avisar, avisarError } from '../ui'
+import { avisar, avisarError, confirmar } from '../ui'
 import { aBase, costoReceta, costoUnitario, margenReal, money, num, pct, precioSugerido } from '../util'
 import type { Catalogo } from './Admin'
 import { Icono } from '../Icono'
@@ -44,7 +44,7 @@ export default function Productos({ cat }: { cat: Catalogo }) {
   }
 
   const borrar = async (p: Producto) => {
-    if (!confirm(`¿Borrar "${p.nombre}"? Las ventas ya hechas no se pierden.`)) return
+    if (!(await confirmar({ titulo: '¿Borrar este producto?', mensaje: `«${p.nombre}» se quita del menú. Las ventas ya hechas no se pierden.`, aceptar: 'Sí, borrar' }))) return
     try {
       await api.del(`/api/productos/${p.id}`)
       await cat.recargar()

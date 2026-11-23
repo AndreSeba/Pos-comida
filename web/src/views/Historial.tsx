@@ -1,6 +1,6 @@
 import { api } from '../api'
 import type { VentaAdmin } from '../types'
-import { Estado, avisarError, useCarga } from '../ui'
+import { Estado, avisarError, useCarga, confirmar } from '../ui'
 import { fechaCorta, horaCorta, money, pagosTexto } from '../util'
 import { Icono } from '../Icono'
 import { Paginador, usePaginas } from '../paginacion'
@@ -10,7 +10,7 @@ export default function Historial({ moneda: m }: { moneda: string }) {
   const pag = usePaginas(r.datos ?? [])
 
   const cambiar = async (v: VentaAdmin) => {
-    if (!v.anulada && !confirm('¿Anular esta venta? Dejará de contar en los reportes.')) return
+    if (!v.anulada && !(await confirmar({ titulo: '¿Anular esta venta?', mensaje: 'Dejará de contar en los reportes. Podrás restaurarla cuando quieras.', aceptar: 'Sí, anular' }))) return
     try {
       await api.put(`/api/ventas/${v.id}/anulada`, !v.anulada)
       await r.recargar()

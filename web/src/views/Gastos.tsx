@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { api } from '../api'
 import type { Gasto } from '../types'
-import { Estado, avisar, avisarError, useCarga } from '../ui'
+import { Estado, avisar, avisarError, useCarga, confirmar } from '../ui'
 import { fechaCorta, money, num } from '../util'
 import { Icono } from '../Icono'
 import { Paginador, usePaginas } from '../paginacion'
@@ -40,7 +40,7 @@ export default function Gastos({ moneda: m }: { moneda: string }) {
   }
 
   const borrar = async (x: Gasto) => {
-    if (!confirm(`¿Borrar el gasto "${x.concepto}"?`)) return
+    if (!(await confirmar({ titulo: '¿Borrar este gasto?', mensaje: `«${x.concepto}» se quita del registro de gastos.`, aceptar: 'Sí, borrar' }))) return
     try {
       await api.del(`/api/gastos/${x.id}`)
       await g.recargar()

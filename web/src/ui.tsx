@@ -15,6 +15,78 @@ export function avisar(texto: string, tipo: Aviso['tipo'] = 'ok') {
 }
 export const avisarError = (e: unknown) => avisar(mensajeError(e), 'error')
 
+/* ------------------------------ confirmaciones (reemplazan al confirm() del navegador) ------------------------------ */
+export type OpcionesConfirmar = {
+  titulo: string
+  mensaje?: string
+  /** texto del botón que confirma */
+  aceptar?: string
+  /** texto del botón que se arrepiente */
+  rechazar?: string
+  /** peligro (rojo, para borrar o anular) o aviso (color de la marca) */
+  tono?: 'peligro' | 'aviso'
+}
+type Pregunta = OpcionesConfirmar & { id: number; resolver: (ok: boolean) => void }
+const preguntas = new Set<(p: Pregunta) => void>()
+
+/** Pregunta con una ventana propia; devuelve true si la persona acepta. Uso: `if (!(await confirmar({ titulo: '…' }))) return` */
+export function confirmar(o: OpcionesConfirmar): Promise<boolean> {
+  return new Promise((resolver) => {
+    if (!preguntas.size) return resolver(window.confirm([o.titulo, o.mensaje].filter(Boolean).join('\n\n')))
+    const p: Pregunta = { ...o, id: ++contador, resolver }
+    preguntas.forEach((f) => f(p))
+  })
+}
+
+function Confirmacion() {
+  const [cola, setCola] = useState<Pregunta[]>([])
+  useEffect(() => {
+    const f = (p: Pregunta) => setCola((c) => [...c, p])
+    preguntas.add(f)
+    return () => {
+      preguntas.delete(f)
+    }
+  }, [])
+  const actual = cola[0]
+  const responder = useCallback(
+    (ok: boolean) => {
+      if (!actual) return
+      actual.resolver(ok)
+      setCola((c) => c.slice(1))
+    },
+    [actual],
+  )
+  useEffect(() => {
+    if (!actual) return
+    const f = (e: KeyboardEvent) => e.key === 'Escape' && responder(false)
+    document.addEventListener('keydown', f)
+    return () => document.removeEventListener('keydown', f)
+  }, [actual, responder])
+  if (!actual) return null
+  const peligro = (actual.tono ?? 'peligro') === 'peligro'
+  return (
+    <div className="modal d-block modal-fondo confirmar-fondo" role="alertdialog" aria-modal="true" aria-labelledby="confirmar-titulo" onClick={() => responder(false)}>
+      <div className="modal-dialog modal-dialog-centered confirmar-dialogo" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-content confirmar-tarjeta text-center">
+          <div className={'confirmar-icono ' + (peligro ? 'peligro' : 'aviso')}>
+            <Icono nombre="alerta" size={30} />
+          </div>
+          <h5 id="confirmar-titulo" className="mb-2">{actual.titulo}</h5>
+          {actual.mensaje && <p className="text-secondary mb-0 confirmar-texto">{actual.mensaje}</p>}
+          <div className="d-grid gap-2 mt-4">
+            <button type="button" autoFocus className={'btn btn-lg ' + (peligro ? 'btn-danger' : 'btn-primary')} onClick={() => responder(true)}>
+              {actual.aceptar ?? 'Aceptar'}
+            </button>
+            <button type="button" className="btn btn-lg btn-outline-secondary" onClick={() => responder(false)}>
+              {actual.rechazar ?? 'Volver'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function Avisos() {
   const [lista, setLista] = useState<Aviso[]>([])
   useEffect(() => {
@@ -28,6 +100,8 @@ export function Avisos() {
     }
   }, [])
   return (
+    <>
+      <Confirmacion />
     <div className="toast-container position-fixed top-0 start-50 translate-middle-x p-3 avisos" aria-live="polite">
       {lista.map((a) => (
         <div key={a.id} className={'toast show border-0 mb-2 ' + (a.tipo === 'ok' ? 'text-bg-success' : 'text-bg-danger')} role="alert">
@@ -37,6 +111,7 @@ export function Avisos() {
         </div>
       ))}
     </div>
+    </>
   )
 }
 
