@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PosComida.Api/PosComida.Api.csproj" />
+    <Project Path="src/PosComida.Application/PosComida.Application.csproj" />
+    <Project Path="src/PosComida.Domain/PosComida.Domain.csproj" />
+    <Project Path="src/PosComida.Infrastructure/PosComida.Infrastructure.csproj" />
+  </Folder>
+</Solution>

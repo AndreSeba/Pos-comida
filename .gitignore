@@ -1,0 +1,18 @@
+# .NET
+bin/
+obj/
+*.user
+.vs/
+# Node
+node_modules/
+web/dist/
+# Secretos / entornos locales
+.env
+.env.*
+appsettings.Production.json
+
+# Postgres portátil para pruebas locales
+.tools/
+
+# Aplicación compilada que la API entrega en el modo sin internet (scripts/servidor-local.ps1)
+api/src/PosComida.Api/wwwroot/

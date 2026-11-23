@@ -1,0 +1,16 @@
+# Postgres para desarrollo. Arranque: docker compose up -d
+services:
+  db:
+    image: postgres:17
+    container_name: poscomida-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: poscomida
+      POSTGRES_USER: pos
+      POSTGRES_PASSWORD: pos_dev_password
+    ports:
+      - "5433:5432"   # 5433 para no chocar con un Postgres local en 5432
+    volumes:
+      - poscomida-data:/var/lib/postgresql/data
+volumes:
+  poscomida-data:

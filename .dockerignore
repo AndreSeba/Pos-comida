@@ -1,0 +1,10 @@
+.tools/
+.git/
+**/node_modules/
+**/bin/
+**/obj/
+web/dist/
+api/src/PosComida.Api/wwwroot/
+docs/
+scripts/
+*.md
